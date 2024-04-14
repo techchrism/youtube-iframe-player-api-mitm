@@ -7,6 +7,8 @@ import VideoEventSource from '../components/VideoEventSource'
 import EventListElement from '../components/EventListElement'
 import EventDetails from '../components/EventDetails'
 
+const emptyListeningMessageContents = '{"event":"listening","id":1,"channel":"widget"}'
+
 export type EventsDisplayProps = {
     events: ApiEvent[] | undefined
     videoID: string | undefined
@@ -23,12 +25,14 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     // Filters
     const [showIncoming, setShowIncoming] = createSignal(true)
     const [showOutgoing, setShowOutgoing] = createSignal(true)
+    const [showEmptyListening, setShowEmptyListening] = createSignal(true)
 
     const shownItems = createMemo(() => {
         return items().filter(item => {
             if(item.direction === 'incoming' && !showIncoming()) return false
             if(item.direction === 'outgoing' && !showOutgoing()) return false
             if(search() !== '' && (item.type === 'text' && !item.data.includes(search()))) return false
+            if(!showEmptyListening() && item.type === 'text' && item.direction === 'outgoing' && item.data === emptyListeningMessageContents) return false
 
             return true
         })
@@ -66,6 +70,13 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                                 <label class="label cursor-pointer">
                                     <span class="label-text"><FiArrowUpRight color="#3B82F6" class="inline"/> Outgoing</span>
                                     <input type="checkbox" checked class="checkbox" onClick={(e) => setShowOutgoing((e.target as HTMLInputElement).checked)}/>
+                                </label>
+
+                                <div class="divider my-0"/>
+
+                                <label class="label cursor-pointer">
+                                    <span class="label-text">Empty Listening Event</span>
+                                    <input type="checkbox" checked class="checkbox" onClick={(e) => setShowEmptyListening((e.target as HTMLInputElement).checked)}/>
                                 </label>
                             </div>
                         </div>
