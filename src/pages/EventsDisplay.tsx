@@ -26,6 +26,7 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     const [showIncoming, setShowIncoming] = createSignal(true)
     const [showOutgoing, setShowOutgoing] = createSignal(true)
     const [showEmptyListening, setShowEmptyListening] = createSignal(true)
+    const [showInfoDelivery, setShowInfoDelivery] = createSignal(true)
 
     const shownItems = createMemo(() => {
         return items().filter(item => {
@@ -33,6 +34,7 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
             if(item.direction === 'outgoing' && !showOutgoing()) return false
             if(search() !== '' && (item.type === 'text' && !item.data.includes(search()))) return false
             if(!showEmptyListening() && item.type === 'text' && item.direction === 'outgoing' && item.data === emptyListeningMessageContents) return false
+            if(!showInfoDelivery() && item.type === 'text' && item.direction === 'incoming' && item.data.includes('"event":"infoDelivery"')) return false
 
             return true
         })
@@ -77,6 +79,10 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                                 <label class="label cursor-pointer">
                                     <span class="label-text">Empty Listening Event</span>
                                     <input type="checkbox" checked class="checkbox" onClick={(e) => setShowEmptyListening((e.target as HTMLInputElement).checked)}/>
+                                </label>
+                                <label class="label cursor-pointer">
+                                    <span class="label-text">Info Delivery</span>
+                                    <input type="checkbox" checked class="checkbox" onClick={(e) => setShowInfoDelivery((e.target as HTMLInputElement).checked)}/>
                                 </label>
                             </div>
                         </div>
