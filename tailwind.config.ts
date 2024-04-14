@@ -8,7 +8,11 @@ const config: Config = {
     ],
     darkMode: 'class',
     theme: {
-        extend: {}
+        extend: {
+            gridTemplateColumns: {
+                'main': '450px 1fr'
+            }
+        }
     },
     plugins: [
         daisyui

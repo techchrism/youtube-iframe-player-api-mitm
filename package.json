@@ -20,6 +20,9 @@
         "vite-plugin-solid": "^2.8.2"
     },
     "dependencies": {
+        "@alenaksu/json-viewer": "^2.0.1",
+        "@minht11/solid-virtual-container": "^0.2.1",
+        "solid-icons": "^1.1.0",
         "solid-js": "^1.8.11"
     }
 }
