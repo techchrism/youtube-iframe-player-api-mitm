@@ -25,9 +25,13 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     const [showOutgoing, setShowOutgoing] = createSignal(true)
 
     const shownItems = createMemo(() => {
-        return items()
-            .filter(item => item.direction !== 'incoming' || showIncoming())
-            .filter(item => item.direction !== 'outgoing' || showOutgoing())
+        return items().filter(item => {
+            if(item.direction === 'incoming' && !showIncoming()) return false
+            if(item.direction === 'outgoing' && !showOutgoing()) return false
+            if(search() !== '' && (item.type === 'text' && !item.data.includes(search()))) return false
+
+            return true
+        })
     })
 
     const activeItem = createMemo(() => shownItems()[activeIndex()])
