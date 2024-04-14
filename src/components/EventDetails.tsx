@@ -33,12 +33,38 @@ const EventDetails: Component<EventDetailsProps> = (props) => {
     })
 
     return (
-        <div>
+        <>
             <Show when={jsonData() !== undefined}>
-                <json-viewer data={jsonData()} ref={jsonViewer}/>
+                <div tabindex="0" class="collapse collapse-plus border bg-base-200 rounded-box">
+                    <input type="checkbox" checked/>
+                    <div class="collapse-title text-xl font-medium">
+                        Parsed JSON Data
+                    </div>
+                    <div class="collapse-content">
+                        <json-viewer data={jsonData()} ref={jsonViewer}/>
+                    </div>
+                </div>
+            </Show>
+
+            <Show when={props.item.type === 'text' && props.item}>
+                {item =>
+                    <>
+                        <div tabindex="0" class="collapse collapse-plus border bg-base-200 rounded-box">
+                            <input type="checkbox"/>
+                            <div class="collapse-title text-xl font-medium">
+                                Text Data
+                            </div>
+                            <div class="collapse-content">
+                                <code class="break-all">
+                                    {item().data}
+                                </code>
+                            </div>
+                        </div>
+                    </>
+                }
             </Show>
             {/* TODO show text and api data */}
-        </div>
+        </>
     )
 }
 
