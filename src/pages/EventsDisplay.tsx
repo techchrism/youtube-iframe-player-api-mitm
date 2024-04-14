@@ -20,7 +20,17 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     const [search, setSearch] = createSignal('')
     const [items, setItems] = createSignal<ApiEvent[]>(props.events ?? [])
 
-    const activeItem = createMemo(() => items()[activeIndex()])
+    // Filters
+    const [showIncoming, setShowIncoming] = createSignal(true)
+    const [showOutgoing, setShowOutgoing] = createSignal(true)
+
+    const shownItems = createMemo(() => {
+        return items()
+            .filter(item => item.direction !== 'incoming' || showIncoming())
+            .filter(item => item.direction !== 'outgoing' || showOutgoing())
+    })
+
+    const activeItem = createMemo(() => shownItems()[activeIndex()])
 
     const ListItem = (props: VirtualItemProps<any>) => {
         return (
@@ -47,18 +57,18 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                             <div tabindex="0" class="dropdown-content p-2 shadow bg-base-100 rounded-box w-52">
                                 <label class="label cursor-pointer">
                                     <span class="label-text"><FiArrowDownLeft color="#F97316" class="inline"/> Incoming</span>
-                                    <input type="checkbox" checked class="checkbox"/>
+                                    <input type="checkbox" checked class="checkbox" onClick={(e) => setShowIncoming((e.target as HTMLInputElement).checked)}/>
                                 </label>
                                 <label class="label cursor-pointer">
                                     <span class="label-text"><FiArrowUpRight color="#3B82F6" class="inline"/> Outgoing</span>
-                                    <input type="checkbox" checked class="checkbox"/>
+                                    <input type="checkbox" checked class="checkbox" onClick={(e) => setShowOutgoing((e.target as HTMLInputElement).checked)}/>
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <ul class="menu bg-base-200 text-base-content">
-                    <VirtualContainer items={items()} itemSize={{height: 58}} scrollTarget={sidebarElement}>
+                    <VirtualContainer items={shownItems()} itemSize={{height: 58}} scrollTarget={sidebarElement}>
                         {ListItem}
                     </VirtualContainer>
                 </ul>
