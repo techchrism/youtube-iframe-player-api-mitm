@@ -26,8 +26,73 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
 
     // Set up iframe api ready callback
     window['onYouTubeIframeAPIReady'] = () => {
+        // Use a proxy on the element to intercept postMessage calls
+        const iframeProxy = new Proxy(videoIframeElement, {
+            get: (target, p, receiver) => {
+                const value = target[p]
+
+                if(p === 'contentWindow') {
+                    if(value === null) return value
+
+                    return new Proxy(value, {
+                        set: (target, p, newVal) => {
+                            target[p] = newVal
+                            return true
+                        },
+                        get: (target, p, receiver) => {
+                            const value = target[p]
+
+                            if(p === 'postMessage') {
+                                return function (...args: any[]) {
+                                    const message = args[0]
+                                    if(message !== undefined) {
+                                        const base = {
+                                            direction: 'outgoing' as const,
+                                            time: Date.now()
+                                        }
+
+                                        if(typeof message === 'object') {
+                                            props.onEvent({...base, type: 'json', data: message})
+                                        } else if(typeof message === 'string') {
+                                            try {
+                                                props.onEvent({...base, type: 'json', data: JSON.parse(message)})
+                                            } catch(_ignored) {
+                                                props.onEvent({...base, type: 'text', data: message})
+                                            }
+                                        } else {
+                                            console.warn('Unknown message type', message)
+                                        }
+                                    }
+
+                                    return value.apply(this === receiver ? target : this, args)
+                                }
+                            }
+
+                            if(value instanceof Function) {
+                                return function (...args: any[]) {
+                                    return value.apply(this === receiver ? target : this, args)
+                                }
+                            }
+                            return value;
+                        }
+                    })
+                }
+
+                if(value instanceof Function) {
+                    return function (...args: any[]) {
+                        return value.apply(this === receiver ? target : this, args)
+                    }
+                }
+                return value
+            },
+            set: (target, p, newVal) => {
+                target[p] = newVal
+                return true
+            }
+        })
+
         // @ts-ignore
-        const player = new YT.Player(videoIframeElement, {
+        const player = new YT.Player(iframeProxy, {
             playerVars: {
                 playsinline: 1
             }/*,
