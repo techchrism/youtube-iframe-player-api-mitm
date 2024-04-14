@@ -46,14 +46,14 @@ const Home: Component<HomeProps> = (props) => {
                     <div class="outline outline-2 rounded p-5">
                         <div class="space-y-2">
                             <p class="text-lg">Record API events from interacting with a video</p>
-                            <form action="javascript:void(0)">
+                            <form onSubmit={e => {e.preventDefault(); onBeginClick()}}>
                                 <div class="join">
                                     <input
                                         class="input input-bordered join-item w-[25rem]"
                                         value={videoValue()}
                                         onInput={e => setVideoValue(e.target.value)}
                                     />
-                                    <button class="btn btn-primary join-item" onClick={onBeginClick}>Begin</button>
+                                    <button class="btn btn-primary join-item">Begin</button>
                                 </div>
                             </form>
                             <Show when={videoInputError()}>
