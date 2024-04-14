@@ -3,9 +3,6 @@ export type ApiEvent = {
     direction: 'incoming' | 'outgoing'
     time: number
 } & ({
-    type: 'json'
-    data: any
-} | {
     type: 'text'
     data: string
 } | {

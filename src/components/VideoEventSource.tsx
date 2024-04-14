@@ -11,17 +11,12 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
 
     // Listen to incoming messages
     window.addEventListener('message', (event) => {
-        const base = {
-            direction: 'incoming' as const,
-            time: Date.now()
-        }
-
-        try {
-            const data = JSON.parse(event.data)
-            props.onEvent({...base, type: 'json', data})
-        } catch(_ignored) {
-            props.onEvent({...base, type: 'text', data: event.data})
-        }
+        props.onEvent({
+            direction: 'incoming',
+            time: Date.now(),
+            type: 'text',
+            data: event.data
+        })
     })
 
     // Set up iframe api ready callback
@@ -51,16 +46,15 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
                                             time: Date.now()
                                         }
 
-                                        if(typeof message === 'object') {
-                                            props.onEvent({...base, type: 'json', data: message})
-                                        } else if(typeof message === 'string') {
-                                            try {
-                                                props.onEvent({...base, type: 'json', data: JSON.parse(message)})
-                                            } catch(_ignored) {
-                                                props.onEvent({...base, type: 'text', data: message})
-                                            }
+                                        if(typeof message === 'string') {
+                                            props.onEvent({
+                                                direction: 'outgoing',
+                                                time: Date.now(),
+                                                type: 'text',
+                                                data: message
+                                            })
                                         } else {
-                                            console.warn('Unknown message type', message)
+                                            console.warn(`Unhandled message type (${typeof message})`, message)
                                         }
                                     }
 

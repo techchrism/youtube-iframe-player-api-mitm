@@ -16,6 +16,15 @@ function simpleZeroPad(num: number): string {
 const EventListElement: Component<EventElementProps> = (props) => {
     const time = createMemo(() => new Date(props.event.time))
 
+    const jsonData = createMemo(() => {
+        try {
+            if(props.event.type !== 'text') return undefined
+            return JSON.parse(props.event.data)
+        } catch (_ignored) {
+            return undefined
+        }
+    })
+
     return (
         <div class="flex flex-row items-center space-x-3 w-full max-w-full h-[40px]">
             <div>
@@ -28,11 +37,11 @@ const EventListElement: Component<EventElementProps> = (props) => {
             <div class="flex-grow overflow-hidden">
                 <div class="flex flex-row items-center space-x-1 font-semibold">
                     <Switch>
-                        <Match when={props.event.type === 'json' && props.event}>
-                            {event =>
+                        <Match when={jsonData()}>
+                            {data =>
                                 <>
                                     <VsJson/>
-                                    <span>{(event().data['event'] ?? 'JSON') + ' Event'}</span>
+                                    <span>{(data()['event'] ?? 'JSON') + ' Event'}</span>
                                 </>
                             }
                         </Match>
