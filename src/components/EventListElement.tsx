@@ -58,11 +58,24 @@ const EventListElement: Component<EventElementProps> = (props) => {
                         </Match>
                         <Match when={props.event.type === 'api'}>
                             <OcCommandpalette2/>
-                            {/*TODO: Add API event data*/}
+                            <span>API Call Event</span>
                         </Match>
                     </Switch>
                 </div>
-                {/* TODO show preview for event data */}
+                <div class="break-keep text-nowrap truncate font-light">
+                    <Switch>
+                        <Match when={props.event.type === 'text' && props.event}>
+                            {event => <>
+                                {event().data.substring(0, 100)}...
+                            </>}
+                        </Match>
+                        <Match when={props.event.type === 'api' && props.event}>
+                            {event => <>
+                                {event().name}({event().arguments.join(', ')})
+                            </>}
+                        </Match>
+                    </Switch>
+                </div>
             </div>
             <div class="text-center whitespace-nowrap">
                 {`${simpleZeroPad(time().getHours())}:${simpleZeroPad(time().getMinutes())}`}
