@@ -1,11 +1,12 @@
 
 export type ApiEvent = {
-    direction: 'incoming' | 'outgoing'
+    direction: 'incoming' | 'outgoing' | 'internal'
     time: number
 } & ({
     type: 'text'
     data: string
 } | {
     type: 'api'
-    //TODO add API event data
+    name: string
+    arguments: any[]
 })

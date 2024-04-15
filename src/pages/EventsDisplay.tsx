@@ -6,6 +6,8 @@ import {ApiEvent} from '../ApiEvent'
 import VideoEventSource from '../components/VideoEventSource'
 import EventListElement from '../components/EventListElement'
 import EventDetails from '../components/EventDetails'
+import {VsDash} from 'solid-icons/vs'
+import {FaSolidCircleDot} from 'solid-icons/fa'
 
 const emptyListeningMessageContents = '{"event":"listening","id":1,"channel":"widget"}'
 
@@ -25,6 +27,7 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     // Filters
     const [showIncoming, setShowIncoming] = createSignal(true)
     const [showOutgoing, setShowOutgoing] = createSignal(true)
+    const [showInternal, setShowInternal] = createSignal(true)
     const [showEmptyListening, setShowEmptyListening] = createSignal(true)
     const [showInfoDelivery, setShowInfoDelivery] = createSignal(true)
 
@@ -32,6 +35,7 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
         return items().filter(item => {
             if(item.direction === 'incoming' && !showIncoming()) return false
             if(item.direction === 'outgoing' && !showOutgoing()) return false
+            if(item.direction === 'internal' && !showInternal()) return false
             if(search() !== '' && (item.type === 'text' && !item.data.includes(search()))) return false
             if(!showEmptyListening() && item.type === 'text' && item.direction === 'outgoing' && item.data === emptyListeningMessageContents) return false
             if(!showInfoDelivery() && item.type === 'text' && item.direction === 'incoming' && item.data.includes('"event":"infoDelivery"')) return false
@@ -66,12 +70,16 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                             <label tabindex="0" class="btn"><FiFilter title="Filter"/></label>
                             <div tabindex="0" class="dropdown-content p-2 shadow bg-base-100 rounded-box w-52">
                                 <label class="label cursor-pointer">
-                                    <span class="label-text"><FiArrowDownLeft color="#F97316" class="inline"/> Incoming</span>
+                                    <span class="label-text flex flex-row items-center gap-2"><FiArrowDownLeft color="#F97316" class="inline"/> Incoming</span>
                                     <input type="checkbox" checked class="checkbox" onClick={(e) => setShowIncoming((e.target as HTMLInputElement).checked)}/>
                                 </label>
                                 <label class="label cursor-pointer">
-                                    <span class="label-text"><FiArrowUpRight color="#3B82F6" class="inline"/> Outgoing</span>
+                                    <span class="label-text flex flex-row items-center gap-2"><FiArrowUpRight color="#3B82F6" class="inline"/> Outgoing</span>
                                     <input type="checkbox" checked class="checkbox" onClick={(e) => setShowOutgoing((e.target as HTMLInputElement).checked)}/>
+                                </label>
+                                <label class="label cursor-pointer">
+                                    <span class="label-text flex flex-row items-center gap-2"><FaSolidCircleDot color="#518DC9" class="inline"/> Internal</span>
+                                    <input type="checkbox" checked class="checkbox" onClick={(e) => setShowInternal((e.target as HTMLInputElement).checked)}/>
                                 </label>
 
                                 <div class="divider my-0"/>

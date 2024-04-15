@@ -4,6 +4,7 @@ import {FiArrowDownLeft, FiArrowUpRight} from 'solid-icons/fi'
 import {VsJson} from 'solid-icons/vs'
 import {RiEditorText} from 'solid-icons/ri'
 import {OcCommandpalette2} from 'solid-icons/oc'
+import {FaSolidCircleDot} from 'solid-icons/fa'
 
 export type EventElementProps = {
     event: ApiEvent
@@ -28,11 +29,17 @@ const EventListElement: Component<EventElementProps> = (props) => {
     return (
         <div class="flex flex-row items-center space-x-3 w-full max-w-full h-[40px]">
             <div>
-                <Show when={props.event.direction === 'incoming'} fallback={
-                    <FiArrowUpRight color="#3B82F6"/>
-                }>
-                    <FiArrowDownLeft color="#F97316"/>
-                </Show>
+                <Switch>
+                    <Match when={props.event.direction === 'incoming'}>
+                        <FiArrowDownLeft color="#F97316"/>
+                    </Match>
+                    <Match when={props.event.direction === 'outgoing'}>
+                        <FiArrowUpRight color="#3B82F6"/>
+                    </Match>
+                    <Match when={props.event.direction === 'internal'}>
+                        <FaSolidCircleDot color="#518DC9"/>
+                    </Match>
+                </Switch>
             </div>
             <div class="flex-grow overflow-hidden">
                 <div class="flex flex-row items-center space-x-1 font-semibold">

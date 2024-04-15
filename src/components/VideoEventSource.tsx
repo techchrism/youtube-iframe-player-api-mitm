@@ -1,6 +1,5 @@
 import {Component, createSignal, Show} from 'solid-js'
 import {ApiEvent} from '../ApiEvent'
-import {AiOutlineInfoCircle} from 'solid-icons/ai'
 import {FiInfo} from 'solid-icons/fi'
 
 export type VideoEventSourceProps = {
@@ -60,16 +59,10 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
                                             console.warn(`Unhandled message type (${typeof message})`, message)
                                         }
                                     }
-
-                                    return value.apply(this === receiver ? target : this, args)
+                                    return value.apply(target, args)
                                 }
                             }
 
-                            if(value instanceof Function) {
-                                return function (...args: any[]) {
-                                    return value.apply(this === receiver ? target : this, args)
-                                }
-                            }
                             return value;
                         }
                     })
@@ -95,7 +88,30 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
             },
             events: {
                 onReady: (event: any) => {
-                    const player = new Proxy(event['target'], {})
+                    const handler = {
+                        get: (target: any, p: PropertyKey, receiver: any) => {
+                            const value = target[p]
+                            if(value === null) return value
+
+                            if(value instanceof Function) {
+                                return function (...args: any[]) {
+                                    props.onEvent({
+                                        direction: 'internal',
+                                        time: Date.now(),
+                                        type: 'api',
+                                        name: String(p),
+                                        arguments: args
+                                    })
+                                    return value.apply(target, args)
+                                }
+                            }
+                            if(typeof value === 'object') {
+                                return new Proxy(target[p], handler)
+                            }
+                            return value
+                        }
+                    }
+                    const player = new Proxy(event['target'], handler)
                     setPlayer(player)
                     window['player'] = player
                 },
