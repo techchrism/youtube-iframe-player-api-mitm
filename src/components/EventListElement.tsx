@@ -71,7 +71,7 @@ const EventListElement: Component<EventElementProps> = (props) => {
                         </Match>
                         <Match when={props.event.type === 'api' && props.event}>
                             {event => <>
-                                {event().name}({event().arguments.join(', ')})
+                                {event().name}({event().arguments.map(a => JSON.stringify(a)).join(', ')})
                             </>}
                         </Match>
                     </Switch>

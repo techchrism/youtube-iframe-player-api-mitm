@@ -1,5 +1,5 @@
 import {ApiEvent} from '../ApiEvent'
-import {Component, ComponentProps, createEffect, createMemo, Show} from 'solid-js'
+import {Component, ComponentProps, createEffect, createMemo, For, Show} from 'solid-js'
 
 // Types for the json-viewer component, modified from https://stackoverflow.com/a/72239265
 declare module 'solid-js' {
@@ -63,7 +63,25 @@ const EventDetails: Component<EventDetailsProps> = (props) => {
                     </>
                 }
             </Show>
-            {/* TODO show text and api data */}
+
+            <Show when={props.item.type === 'api' && props.item}>
+                {item => <>
+                    <div>
+                        <span class="font-bold">Function: </span><span>{item().name}</span>
+                        <Show when={item().arguments.length > 0}>
+                            <br/>
+                            <span class="font-bold">Arguments:</span>
+                            <ul class="list-disc list-inside">
+                                <For each={item().arguments}>
+                                    {arg => <>
+                                        <li>{JSON.stringify(arg)}</li>
+                                    </>}
+                                </For>
+                            </ul>
+                        </Show>
+                    </div>
+                </>}
+            </Show>
         </>
     )
 }
