@@ -1,5 +1,7 @@
-import {Component} from 'solid-js'
+import {Component, createSignal, Show} from 'solid-js'
 import {ApiEvent} from '../ApiEvent'
+import {AiOutlineInfoCircle} from 'solid-icons/ai'
+import {FiInfo} from 'solid-icons/fi'
 
 export type VideoEventSourceProps = {
     videoID: string
@@ -8,6 +10,7 @@ export type VideoEventSourceProps = {
 
 const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
     let videoIframeElement: HTMLIFrameElement
+    const [player, setPlayer] = createSignal<any | undefined>(undefined)
 
     // Listen to incoming messages
     window.addEventListener('message', (event) => {
@@ -89,11 +92,21 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
         const player = new YT.Player(iframeProxy, {
             playerVars: {
                 playsinline: 1
-            }/*,
+            },
             events: {
-                onReady: onPlayerReady,
-                onStateChange: onPlayerStateChange
-            }*/
+                onReady: (event: any) => {
+                    const player = new Proxy(event['target'], {})
+                    setPlayer(player)
+                    window['player'] = player
+                },
+                // Listen to all other events
+                onAutoplayBlocked: (event: any) => {},
+                onApiChange: (event: any) => {},
+                onError: (event: any) => {},
+                onPlaybackRateChange: (event: any) => {},
+                onPlaybackQualityChange: (event: any) => {},
+                onStateChange: (event: any) => {},
+            }
         })
     }
 
@@ -105,6 +118,21 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
     return (
         <div class="flex flex-row">
             <iframe ref={videoIframeElement} width="640" height="360" src={`https://www.youtube.com/embed/${props.videoID}?enablejsapi=1`}/>
+            <Show when={player()}>
+                {player => <>
+                    <div class="divider divider-horizontal"/>
+                    <div class="flex flex-col h-full">
+                        <div class="alert mt-auto w-max">
+                            <FiInfo />
+                            <p>
+                                The player API is exposed as <code class="p-1 text-black bg-white dark:text-white dark:bg-black">player</code> in the dev console
+                                <br/>
+                                For more info, see <a class="underline" referrerpolicy="no-referrer" target="_blank" href="https://developers.google.com/youtube/iframe_api_reference">https://developers.google.com/youtube/iframe_api_reference</a>
+                            </p>
+                        </div>
+                    </div>
+                </>}
+            </Show>
         </div>
     )
 }
