@@ -6,8 +6,8 @@ import {ApiEvent} from '../ApiEvent'
 import VideoEventSource from '../components/VideoEventSource'
 import EventListElement from '../components/EventListElement'
 import EventDetails from '../components/EventDetails'
-import {VsDash} from 'solid-icons/vs'
 import {FaSolidCircleDot} from 'solid-icons/fa'
+import {BiSolidDownload} from 'solid-icons/bi'
 
 const emptyListeningMessageContents = '{"event":"listening","id":1,"channel":"widget"}'
 
@@ -18,7 +18,6 @@ export type EventsDisplayProps = {
 
 const EventsDisplay: Component<EventsDisplayProps> = (props) => {
     let sidebarElement: HTMLElement
-    let videoIframeElement: HTMLIFrameElement | undefined = undefined
 
     const [activeIndex, setActiveIndex] = createSignal(0)
     const [search, setSearch] = createSignal('')
@@ -58,6 +57,21 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
         )
     }
 
+    const onDownload = () => {
+        const data = JSON.stringify({
+            type: 'youtube-iframe-api-mitm-events',
+            version: '1.0.0',
+            events: items()
+        }, null, 4)
+        const blob = new Blob([data], {type: 'application/json'})
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'events.json'
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     return (
         <div class="min-h-screen md:grid md:grid-cols-main">
             <aside class="md:sticky top-0 left-0 md:h-screen overflow-y-auto" aria-label="Sidebar" ref={sidebarElement}>
@@ -67,7 +81,7 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                     <div class="mx-2 flex flex-row">
                         <input type="text" class="input mr-2 flex-grow" placeholder="Search..." oninput={(e) => {setSearch((e.target as HTMLInputElement).value)}}/>
                         <div class="dropdown dropdown-end">
-                            <label tabindex="0" class="btn"><FiFilter title="Filter"/></label>
+                            <label tabindex="0" class="btn" title="Filter"><FiFilter title="Filter"/></label>
                             <div tabindex="0" class="dropdown-content p-2 shadow bg-base-100 rounded-box w-52">
                                 <label class="label cursor-pointer">
                                     <span class="label-text flex flex-row items-center gap-2"><FiArrowDownLeft color="#F97316" class="inline"/> Incoming</span>
@@ -94,6 +108,9 @@ const EventsDisplay: Component<EventsDisplayProps> = (props) => {
                                 </label>
                             </div>
                         </div>
+                        <button class="btn mx-2" title="Download" onClick={onDownload}>
+                            <BiSolidDownload />
+                        </button>
                     </div>
                 </div>
                 <ul class="menu bg-base-200 text-base-content">
