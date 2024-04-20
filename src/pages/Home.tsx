@@ -39,11 +39,13 @@ const Home: Component<HomeProps> = (props) => {
             <div class="hero-content text-center">
                 <div class="max-w-2xl">
                     <h1 class="text-5xl font-bold">YouTube Iframe Player API MITM</h1>
-                    <p class="py-6">
-                        {/*TODO add description*/}
+                    <p class="py-6 text-xl">
+                        This is a tool to record messages sent and received by the YouTube Iframe Player API.
+                        <br/>
+                        The goal of this is to develop an understanding of how the API works and to help with reverse engineering to create a custom implementation.
                     </p>
 
-                    <div class="outline outline-2 rounded p-5">
+                    <div class="outline outline-2 rounded-3xl p-7">
                         <div class="space-y-2">
                             <p class="text-lg">Record API events from interacting with a video</p>
                             <form onSubmit={e => {e.preventDefault(); onBeginClick()}}>
