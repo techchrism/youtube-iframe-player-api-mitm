@@ -1,5 +1,11 @@
-import {Component, createSignal, Show} from 'solid-js'
+import {Component, createEffect, createResource, createSignal, Show} from 'solid-js'
 import {ApiEvent} from '../ApiEvent'
+
+type ParsedEvents = {
+    type: 'youtube-iframe-api-mitm-events',
+    version: string,
+    events: ApiEvent[]
+}
 
 const initialVideoValue = 'https://www.youtube.com/watch?v=bHQqvYy5KYo'
 
@@ -15,6 +21,17 @@ function getVideoID(urlOrID: string): string {
     }
 }
 
+async function readFile(file: File | undefined): Promise<ParsedEvents | undefined> {
+    if(file === undefined) {
+        return undefined
+    }
+    const data = JSON.parse(await file.text())
+    if(data.type !== 'youtube-iframe-api-mitm-events') {
+        throw new Error('Invalid file type')
+    }
+    return data
+}
+
 export type HomeProps = {
     onUpload: (events: ApiEvent[]) => void
     onVideoID: (videoID: string) => void
@@ -25,6 +42,16 @@ const Home: Component<HomeProps> = (props) => {
     const [videoValue, setVideoValue] = createSignal(initialVideoValue)
     const [videoInputError, setVideoInputError] = createSignal<string | undefined>(undefined)
 
+    const [file, setFile] = createSignal<File | undefined>(undefined)
+    const [parsedData] = createResource(file, readFile)
+
+    createEffect(() => {
+        const parsed = parsedData()
+        if(parsed !== undefined) {
+            props.onUpload(parsed.events)
+        }
+    })
+
     const onBeginClick = () => {
         setVideoInputError(undefined)
         try {
@@ -32,6 +59,10 @@ const Home: Component<HomeProps> = (props) => {
         } catch(e) {
             setVideoInputError(e.message)
         }
+    }
+
+    const onChanged = (event: Event) => {
+        setFile((event.target as HTMLInputElement).files[0])
     }
 
     return (
@@ -69,9 +100,14 @@ const Home: Component<HomeProps> = (props) => {
 
                         <div class="space-y-2">
                             <p class="text-lg">Upload a previously-recorded events file</p>
-                            <input type="file" accept=".json" ref={hiddenInput} class="hidden"/>
-                            <button class="btn btn-primary" onClick={() => hiddenInput.click()}>Click to Upload</button>
-                            {/*TODO add file upload*/}
+                            <input type="file" accept=".json" ref={hiddenInput} onChange={onChanged} class="hidden"/>
+                            <button class="btn btn-primary" classList={{loading: parsedData.loading}} onClick={() => hiddenInput.click()}>Click to Upload</button>
+
+                            <Show when={parsedData.state === 'errored'}>
+                                <div class="alert alert-error shadow-lg mt-2">
+                                    {parsedData.error.toString()}
+                                </div>
+                            </Show>
                         </div>
                     </div>
 
