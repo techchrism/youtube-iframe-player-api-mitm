@@ -138,6 +138,15 @@ const VideoEventSource: Component<VideoEventSourceProps> = (props) => {
                 {player => <>
                     <div class="divider divider-horizontal"/>
                     <div class="flex flex-col h-full">
+                        <div class="space-x-2 mb-2">
+                            <button class="btn" onClick={() => player().playVideo()}>Play</button>
+                            <button class="btn" onClick={() => player().pauseVideo()}>Pause</button>
+                            <button class="btn" onClick={() => player().stopVideo()}>Stop</button>
+                        </div>
+                        <div class="space-x-2">
+                            <button class="btn" onClick={() => player().mute()}>Mute</button>
+                            <button class="btn" onClick={() => player().unMute()}>Unmute</button>
+                        </div>
                         <div class="alert mt-auto w-max">
                             <FiInfo />
                             <p>
