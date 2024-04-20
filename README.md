@@ -1,16 +1,12 @@
-## Usage
+# [YouTube Iframe Player API MITM](https://ytplayermitm.techchrism.me)
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+![Project screenshot](https://github.com/techchrism/youtube-iframe-player-api-mitm/assets/26680599/82d21e22-934a-4020-b673-1167385ec4fa)
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+This is a tool to record messages sent and received by the YouTube Iframe Player API.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+The goal of this is to develop an understanding of how the API works and to help with reverse engineering to create a custom implementation.
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
-
-## Available Scripts
+## Development
 
 In the project directory, you can run:
 
@@ -26,9 +22,8 @@ The page will reload if you make edits.<br>
 Builds the app for production to the `dist` folder.<br>
 It correctly bundles Solid in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+The build is minified and the filenames include the hashes.
 
 ## Deployment
 
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+You can deploy the `dist` folder to any static host provider
